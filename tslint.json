@@ -4,6 +4,7 @@
         "tslint:latest"
     ],
     "rules": {
+        "no-implicit-dependencies": false,
         "quotemark": [true, "single", "jsx-double"]
     }
 }
