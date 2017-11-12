@@ -1,26 +1,75 @@
 import * as three from 'three';
 
+const fieldSize = 30;
+const aspect = window.innerWidth / window.innerHeight;
 const scene = new three.Scene();
-const camera = new three.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+scene.background = new three.Color(0xf0f0f0);
 
-const renderer = new three.WebGLRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
+const camera = new three.OrthographicCamera(
+    fieldSize / 2 * aspect,
+    -fieldSize / 2 * aspect,
+    fieldSize / 2,
+    -fieldSize / 2,
+    0,
+    1,
+);
 
-const geometry = new three.BoxGeometry(1, 1, 1);
-const material = new three.MeshBasicMaterial({ color: 0x00ff00 });
-const cube = new three.Mesh(geometry, material);
-scene.add(cube);
-
-camera.position.z = 5;
-
-const animate = () => {
-    requestAnimationFrame(animate);
-
-    cube.rotation.x += 0.1;
-    cube.rotation.y += 0.1;
-
-    renderer.render(scene, camera);
+const makeCircle = (x: number, y: number) => {
+    const material = new three.LineBasicMaterial({color: 0xFF0000});
+    material.side = three.DoubleSide;
+    const circle = new three.Mesh(new three.CircleGeometry(0.3, 20), material);
+    circle.position.set(x, y, 0);
+    scene.add(circle);
 };
 
-animate();
+for (let i = -fieldSize / 2 + 1; i < fieldSize / 2; i++) {
+    for (let j = -fieldSize / 2 + 1; j < fieldSize / 2; j++) {
+        makeCircle(i, j);
+    }
+}
+
+const gridHelper = new three.GridHelper(fieldSize, fieldSize);
+gridHelper.rotateX(90 * Math.PI / 180);
+scene.add(gridHelper);
+
+const renderer = new three.WebGLRenderer();
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.setSize(window.innerWidth, window.innerHeight);
+const canvasElement = renderer.domElement;
+document.body.appendChild(canvasElement);
+
+const raycaster = new three.Raycaster();
+const mouse = new three.Vector2();
+
+function onMouseMove(event: MouseEvent) {
+    event.preventDefault();
+
+    const boundingRect = canvasElement.getBoundingClientRect();
+    const x = event.clientX - boundingRect.left;
+    const y = event.clientY - boundingRect.top;
+    mouse.x = (x / window.innerWidth) * 2 - 1;
+    mouse.y = -(y / window.innerHeight) * 2 + 1;
+}
+
+canvasElement.addEventListener('mousemove', onMouseMove, false);
+
+let firstRun = true;
+function animate() {
+    requestAnimationFrame(animate);
+
+    if (!firstRun) {
+        raycaster.setFromCamera(mouse, camera);
+        raycaster.intersectObjects(scene.children).map(({object}) => {
+            if (!(object instanceof three.Mesh)) {
+                return;
+            }
+
+            (object.material as three.LineBasicMaterial).color = new three.Color(0x0000FF);
+        });
+    }
+
+    renderer.render(scene, camera);
+    firstRun = false;
+}
+
+window.requestAnimationFrame(animate);
