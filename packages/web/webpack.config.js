@@ -1,49 +1,53 @@
+const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const {
-    addPlugins,
-    createConfig,
-    defineConstants,
-    entryPoint,
-    env,
-    setOutput,
-    sourceMaps,
-} = require('@webpack-blocks/webpack');
+const merge = require('webpack-merge');
 
-function typescript() {
-    return (_, { merge }) => merge({
-        resolve: {
-            extensions: ['.ts', '.tsx'],
-        },
-        module: {
-            rules: [
-                {
-                    test: /\.(ts|tsx)$/,
-                    use: [
-                        {
-                            loader: 'ts-loader',
-                            options: {},
-                        },
-                    ],
-                },
-            ],
-        },
-    });
-}
+const entryPoint = {
+    entry: path.resolve(__dirname, 'src', 'index.ts'),
+};
 
-module.exports = createConfig([
-    entryPoint('./src/index.ts'),
-    setOutput('./build/bundle.js'),
-    typescript(),
-    addPlugins([
+const output = {
+    output: {
+        path: path.resolve(__dirname, 'build'),
+        filename: 'bundle.js',
+    },
+};
+
+const resolveEstensions = {
+    resolve: {
+        extensions: ['.ts', '.tsx', '.js'],
+    },
+};
+
+const typescriptConfig = {
+    module: {
+        rules: [
+            {
+                test: /\.(ts|tsx)$/,
+                use: [
+                    {
+                        loader: 'ts-loader',
+                        options: {},
+                    },
+                ],
+            },
+        ],
+    },
+};
+
+const htmlPlugin = {
+    plugins: [
         new HtmlWebpackPlugin({
             inject: true,
-            template: './src/index.html',
+            template: path.resolve(__dirname, 'src', 'index.html'),
         }),
-    ]),
-    defineConstants({
-        'process.env.NODE_ENV': process.env.NODE_ENV || 'development',
-    }),
-    env('development', [
-        sourceMaps('cheap-module-eval-source-map'),
-    ]),
-]);
+    ],
+};
+
+module.exports = merge(
+    entryPoint,
+    output,
+    resolveEstensions,
+    typescriptConfig,
+    htmlPlugin,
+);
