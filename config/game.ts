@@ -2,6 +2,6 @@ export interface IGameConfig {
     fieldSize: number;
 }
 
-export const defaultConfig: IGameConfig = {
+export const defaultConfig: Readonly<IGameConfig> = {
     fieldSize: 30,
 };
