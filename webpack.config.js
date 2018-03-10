@@ -6,6 +6,7 @@ const SOURCE_PATH = path.resolve(__dirname, 'src');
 const CONFIG_PATH = path.resolve(__dirname, 'config');
 const ASSETS_PATH = path.resolve(__dirname, 'assets');
 const BUILD_PATH = path.resolve(__dirname, 'build');
+const NODE_MODULES_PATH = path.resolve(__dirname, 'node_modules');
 
 const entryPoint = {
     entry: path.resolve(SOURCE_PATH, 'index.ts'),
@@ -29,17 +30,30 @@ const aliases = {
         modules: [SOURCE_PATH, 'node_modules'],
         alias: {
             config: CONFIG_PATH,
+            three: path.resolve(NODE_MODULES_PATH, 'three', 'src'),
         },
     },
 };
 
-const typescriptConfig = {
+const typescriptLoader = {
     module: {
         rules: [
             {
                 test: /\.(ts|tsx)$/,
                 loader: 'ts-loader',
                 include: [SOURCE_PATH, CONFIG_PATH],
+            },
+        ],
+    },
+};
+
+const shaderLoader = {
+    module: {
+        rules: [
+            {
+                test: /\.glsl$/,
+                loader: 'shader-loader',
+                include: [NODE_MODULES_PATH],
             },
         ],
     },
@@ -59,6 +73,7 @@ module.exports = merge(
     output,
     resolveEstensions,
     aliases,
-    typescriptConfig,
+    typescriptLoader,
+    shaderLoader,
     htmlPlugin,
 );

@@ -1,10 +1,10 @@
-import * as three from 'three';
+import { Vector2 } from 'three/math/Vector2';
 import { IInteractor } from 'services/Interactions';
 import { Subscription } from 'rxjs';
 
 export default class Controls {
-    private mousePosition: three.Vector2 | null = null;
-    private lastClickPosition: three.Vector2 | null = null;
+    private mousePosition: Vector2 | null = null;
+    private lastClickPosition: Vector2 | null = null;
     private canvas: HTMLCanvasElement;
     private subscriptions: Subscription[];
     private dirty = false;
@@ -50,21 +50,21 @@ export default class Controls {
         this.subscriptions.forEach((subscription) => subscription.unsubscribe());
     }
 
-    private handleNewCursorPosition(newCursorPosition: three.Vector2) {
+    private handleNewCursorPosition(newCursorPosition: Vector2) {
         this.mousePosition = this.clientPositionToRelativePosition(newCursorPosition);
         this.dirty = true;
     }
 
-    private handleClick(clickPosition: three.Vector2) {
+    private handleClick(clickPosition: Vector2) {
         this.lastClickPosition = clickPosition;
         this.dirty = true;
     }
 
-    private clientPositionToRelativePosition(clientPosition: three.Vector2) {
+    private clientPositionToRelativePosition(clientPosition: Vector2) {
         const boundingRect = this.canvas.getBoundingClientRect();
         const x = clientPosition.x - boundingRect.left;
         const y = clientPosition.y - boundingRect.top;
 
-        return new three.Vector2((x / window.innerWidth) * 2 - 1, -(y / window.innerHeight) * 2 + 1);
+        return new Vector2((x / window.innerWidth) * 2 - 1, -(y / window.innerHeight) * 2 + 1);
     }
 }
