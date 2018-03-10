@@ -1,62 +1,21 @@
 import * as three from 'three';
 
-type MouseEventListener = (event: MouseEvent) => void;
-type PositionChangeListener = (position: three.Vector2) => void;
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/fromEvent';
+import 'rxjs/add/operator/map';
 
 export interface IInteractor {
-    listenForCursorMovement(callback: PositionChangeListener): void;
-    listenForClick(callback: PositionChangeListener): void;
-    cleanup(): void;
+    cursorMovement: Observable<three.Vector2>;
+    click: Observable<three.Vector2>;
 }
 
-export function buildMouseInteractor(htmlElement: HTMLElement) {
-    return new MouseInteractor(htmlElement);
+export function buildMouseInteractor(htmlElement: HTMLElement): IInteractor {
+    return {
+        cursorMovement: Observable.fromEvent<MouseEvent>(htmlElement, 'mousemove').map(extractClientPosition),
+        click: Observable.fromEvent<MouseEvent>(htmlElement, 'mousedown').map(extractClientPosition),
+    };
 }
 
-class MouseInteractor implements IInteractor {
-    private htmlElement: HTMLElement;
-
-    private mouseMoveListener: MouseEventListener | null = null;
-    private mouseDownListener: MouseEventListener | null = null;
-
-    public constructor(htmlElement: HTMLElement) {
-        this.htmlElement = htmlElement;
-    }
-
-    public listenForCursorMovement(callback: PositionChangeListener) {
-        if (this.mouseMoveListener) {
-            throw new Error('Only one listener can be added');
-        }
-
-        this.mouseMoveListener = this.addListener('mousemove', callback);
-    }
-
-    public listenForClick(callback: PositionChangeListener) {
-        if (this.mouseDownListener) {
-            throw new Error('Only one listener can be added');
-        }
-
-        this.mouseDownListener = this.addListener('mousedown', callback);
-    }
-
-    public cleanup() {
-        if (this.mouseMoveListener) {
-            this.htmlElement.removeEventListener('mousemove', this.mouseMoveListener);
-        }
-
-        if (this.mouseDownListener) {
-            this.htmlElement.removeEventListener('mousedown', this.mouseDownListener);
-        }
-    }
-
-    private addListener(eventName: 'mousemove' | 'mousedown', callback: PositionChangeListener) {
-        const listener: MouseEventListener = (event) => {
-            event.preventDefault();
-            const position = new three.Vector2(event.clientX, event.clientY);
-            callback(position);
-        };
-        this.htmlElement.addEventListener(eventName, listener);
-
-        return listener;
-    }
+function extractClientPosition(event: MouseEvent) {
+    return new three.Vector2(event.clientX, event.clientY);
 }

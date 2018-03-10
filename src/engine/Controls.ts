@@ -1,19 +1,21 @@
 import * as three from 'three';
 import { IInteractor } from 'services/Interactions';
+import { Subscription } from 'rxjs';
 
 export default class Controls {
     private mousePosition: three.Vector2 | null = null;
     private lastClickPosition: three.Vector2 | null = null;
     private canvas: HTMLCanvasElement;
-    private interactor: IInteractor;
+    private subscriptions: Subscription[];
     private dirty = false;
 
     public constructor(canvas: HTMLCanvasElement, interactor: IInteractor) {
         this.canvas = canvas;
-        this.interactor = interactor;
 
-        this.interactor.listenForCursorMovement((newCursorPosition) => this.handleNewCursorPosition(newCursorPosition));
-        this.interactor.listenForClick((clickPosition) => this.handleClick(clickPosition));
+        this.subscriptions = [
+            interactor.cursorMovement.subscribe((newCursorPosition) => this.handleNewCursorPosition(newCursorPosition)),
+            interactor.click.subscribe((clickPosition) => this.handleClick(clickPosition)),
+        ];
     }
 
     public isInitialized() {
@@ -45,7 +47,7 @@ export default class Controls {
     }
 
     public cleanup() {
-        this.interactor.cleanup();
+        this.subscriptions.forEach((subscription) => subscription.unsubscribe());
     }
 
     private handleNewCursorPosition(newCursorPosition: three.Vector2) {

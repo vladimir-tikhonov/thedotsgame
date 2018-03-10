@@ -24,6 +24,7 @@
     "webpack-merge": "~4.1"
   },
   "dependencies": {
+    "rxjs": "~5.5",
     "three": "~0.90"
   }
 }
