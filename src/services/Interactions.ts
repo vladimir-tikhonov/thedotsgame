@@ -1,5 +1,4 @@
 import { Vector2 } from 'three/math/Vector2';
-
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/fromEvent';
 import 'rxjs/add/operator/map';

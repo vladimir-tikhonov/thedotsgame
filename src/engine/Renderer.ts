@@ -2,6 +2,7 @@ import { Scene } from 'three/scenes/Scene';
 import { Camera } from 'three/cameras/Camera';
 import { WebGLRenderer } from 'three/renderers/WebGLRenderer';
 import { OrthographicCamera } from 'three/cameras/OrthographicCamera';
+
 import { IGameConfig } from 'config/game';
 
 export default class Renderer {

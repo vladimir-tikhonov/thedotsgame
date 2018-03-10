@@ -1,4 +1,6 @@
 import Renderer from 'engine/Renderer';
+import { Subscription } from 'rxjs';
+
 import GameField from 'engine/GameField';
 import Controls from 'engine/Controls';
 import GameState from 'entities/GameState';
@@ -9,12 +11,14 @@ import * as interactions from 'services/Interactions';
 export default class Game {
     private state: GameState;
     private hoveredHitbox: Hitbox | null = null;
+    private dirty = true;
 
     private renderer: Renderer;
     private gameField: GameField;
     private controls: Controls;
 
     private animationFrameRequestId: number | null = null;
+    private subscriptions: Subscription[];
 
     public constructor(container: HTMLElement, initialState: GameState) {
         this.state = initialState;
@@ -24,6 +28,10 @@ export default class Game {
 
         this.gameField = new GameField(this.state.getConfig());
         this.controls = new Controls(canvasElement, interactions.buildMouseInteractor(canvasElement));
+
+        this.subscriptions = [
+            this.controls.cursorMovement.subscribe(() => { this.dirty = true; }),
+        ];
 
         container.appendChild(canvasElement);
     }
@@ -36,19 +44,10 @@ export default class Game {
         if (this.animationFrameRequestId) {
             cancelAnimationFrame(this.animationFrameRequestId);
         }
+        this.subscriptions.forEach((subscription) => subscription.unsubscribe());
+        this.subscriptions = [];
+
         this.controls.cleanup();
-    }
-
-    private isInitialized() {
-        return this.controls.isInitialized();
-    }
-
-    private isDirty() {
-        return this.controls.isDirty();
-    }
-
-    private clearDirtyFlag() {
-        this.controls.clearDirtyFlag();
     }
 
     private sceduleAnimationFrame() {
@@ -58,17 +57,21 @@ export default class Game {
     private animationFrameHandler() {
         this.sceduleAnimationFrame();
 
-        if (!this.isInitialized() || !this.isDirty()) {
+        if (!this.dirty) {
             return;
         }
 
         this.checkHitboxHover();
 
         this.renderer.renderScene(this.gameField.getScene());
-        this.clearDirtyFlag();
+        this.dirty = false;
     }
 
     private checkHitboxHover() {
+        if (!this.controls.isInitialized()) {
+            return;
+        }
+
         const hitboxUnderMouse = hitboxService.getHitboxUnderMouse(this.controls.getMousePosition(),
             this.gameField.getHitboxes(), this.renderer.getCamera());
 

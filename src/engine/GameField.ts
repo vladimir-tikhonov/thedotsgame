@@ -2,6 +2,7 @@ import { Vector2 } from 'three/math/Vector2';
 import { Color } from 'three/math/Color';
 import { Scene } from 'three/scenes/Scene';
 import { GridHelper } from 'three/helpers/GridHelper';
+
 import Hitbox from 'entities/Hitbox';
 import { IGameConfig } from 'config/game';
 
