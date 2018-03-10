@@ -5,6 +5,12 @@
     "importHelpers": true,
     "sourceMap": true,
     "moduleResolution": "node",
+    "baseUrl": "./src",
+    "paths": {
+        "config/*": [
+            "../config/*"
+        ]
+    },
 
     "strict": true,
     "noUnusedLocals": true,

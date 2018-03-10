@@ -5,6 +5,7 @@
     ],
     "rules": {
         "no-implicit-dependencies": false,
-        "quotemark": [true, "single", "jsx-double"]
+        "quotemark": [true, "single", "jsx-double"],
+        "ordered-imports": false,
     }
 }
