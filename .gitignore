@@ -23,3 +23,6 @@ node_modules/
 
 # MacOS scum files
 .DS_Store
+
+# output folder
+build/
