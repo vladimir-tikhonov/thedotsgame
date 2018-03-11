@@ -4,6 +4,7 @@ import { LineBasicMaterial } from 'three/materials/LineBasicMaterial';
 import { CircleGeometry } from 'three/geometries/CircleGeometry';
 
 import Point from 'entities/Point';
+import styles from 'config/styles';
 
 export default class PointOnField {
     private point: Point;
@@ -12,8 +13,8 @@ export default class PointOnField {
     public constructor(point: Point, fieldPosition: Vector2) {
         this.point = point;
 
-        const material = new LineBasicMaterial({color: 0x000F55});
-        this.mesh = new Mesh(new CircleGeometry(0.5, 20), material);
+        const material = new LineBasicMaterial({ color: styles.point.colour });
+        this.mesh = new Mesh(new CircleGeometry(styles.point.radius, styles.point.segments), material);
         this.mesh.position.set(fieldPosition.x, fieldPosition.y, 0);
     }
 

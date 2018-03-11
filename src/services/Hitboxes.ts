@@ -9,6 +9,6 @@ export function getHitboxUnderMouse(mousePosition: Vector2, hitboxes: Hitbox[], 
     raycaster.setFromCamera(mousePosition, camera);
 
     return hitboxes.find((hitbox) => {
-        return raycaster.intersectObject(hitbox.getMesh()).length > 0;
+        return raycaster.intersectObject(hitbox.getHitboxMesh()).length > 0;
     });
 }

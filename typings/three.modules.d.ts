@@ -1,5 +1,5 @@
 declare module 'three/constants' {
-    export { VertexColors } from 'three';
+    export { VertexColors, DoubleSide } from 'three';
 }
 
 declare module 'three/math/Vector2' {
@@ -45,6 +45,10 @@ declare module 'three/objects/LineSegments' {
 
 declare module 'three/objects/Mesh' {
     export { Mesh } from 'three';
+}
+
+declare module 'three/geometries/BoxGeometry' {
+    export { BoxGeometry } from 'three';
 }
 
 declare module 'three/geometries/CircleGeometry' {

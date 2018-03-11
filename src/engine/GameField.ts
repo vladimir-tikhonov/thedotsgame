@@ -71,7 +71,7 @@ export default class GameField {
     private addHitboxAt(fieldPosition: Vector2) {
         const hitbox = new Hitbox(fieldPosition);
         this.hitboxes.push(hitbox);
-        this.scene.add(hitbox.getMesh());
+        this.getScene().add(hitbox.getHitboxMesh(), hitbox.getHighlightMesh());
     }
 
     private removeHitboxAt(fieldPosition: Vector2) {
@@ -82,7 +82,7 @@ export default class GameField {
 
         const hitboxToRemove = this.hitboxes[hitboxIndex];
         this.hitboxes.splice(hitboxIndex, 1);
-        this.getScene().remove(hitboxToRemove.getMesh());
+        this.getScene().remove(hitboxToRemove.getHitboxMesh(), hitboxToRemove.getHighlightMesh());
     }
 
     private initTranslationMatrix(gameConfig: IGameConfig) {
