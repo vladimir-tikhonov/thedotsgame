@@ -18,7 +18,7 @@ export default class Game {
     private controls: Controls;
 
     private animationFrameRequestId: number | null = null;
-    private subscriptions: Subscription[];
+    private subscription: Subscription;
 
     public constructor(container: HTMLElement, initialState: GameState) {
         this.state = initialState;
@@ -29,9 +29,7 @@ export default class Game {
         this.gameField = new GameField(this.state.getConfig());
         this.controls = new Controls(canvasElement, interactions.buildMouseInteractor(canvasElement));
 
-        this.subscriptions = [
-            this.controls.cursorMovement.subscribe(() => { this.dirty = true; }),
-        ];
+        this.subscription = this.controls.onCursorMovement.subscribe(() => { this.dirty = true; });
 
         container.appendChild(canvasElement);
     }
@@ -44,8 +42,7 @@ export default class Game {
         if (this.animationFrameRequestId) {
             cancelAnimationFrame(this.animationFrameRequestId);
         }
-        this.subscriptions.forEach((subscription) => subscription.unsubscribe());
-        this.subscriptions = [];
+        this.subscription.unsubscribe();
 
         this.controls.cleanup();
     }
