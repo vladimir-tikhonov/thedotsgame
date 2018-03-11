@@ -3,8 +3,11 @@
   "version": "0.1.0",
   "main": "src/index.ts",
   "scripts": {
-    "start-dev": "webpack-dev-server --mode=development",
-    "build": "webpack --mode=production"
+    "start": "webpack-dev-server --mode=development",
+    "build": "webpack --mode=production",
+    "tslint": "tslint --project tsconfig.json",
+    "eslint": "eslint *.js",
+    "lint": "npm run tslint && npm run eslint"
   },
   "author": "Vladimir Tikhonov",
   "license": "ISC",

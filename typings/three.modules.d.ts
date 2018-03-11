@@ -3,8 +3,7 @@ declare module 'three/constants' {
 }
 
 declare module 'three/math/Vector2' {
-    import { Vector2 as BaseVector2 } from 'three';
-    import { Matrix3 } from 'three';
+    import { Vector2 as BaseVector2, Matrix3 } from 'three';
 
     export class Vector2 extends BaseVector2 {
         public applyMatrix3(m: Matrix3): Vector2;
