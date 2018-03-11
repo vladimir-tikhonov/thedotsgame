@@ -1,103 +1,78 @@
-import Renderer from 'engine/Renderer';
 import { Subscription } from 'rxjs';
+import { Vector2 } from 'three/math/Vector2';
 
+import Renderer from 'engine/Renderer';
 import GameField from 'engine/GameField';
 import Controls from 'engine/Controls';
+import UI from 'engine/UI';
 import GameState from 'entities/GameState';
-import Hitbox from 'entities/Hitbox';
-import * as hitboxService from 'services/Hitboxes';
+import BaseCommand from 'commands/BaseCommand';
+import AddPointCommand from 'commands/AddPointCommand';
 import * as interactions from 'services/Interactions';
+import * as hitboxService from 'services/Hitboxes';
 
 export default class Game {
     private state: GameState;
-    private hoveredHitbox: Hitbox | null = null;
-    private dirty = true;
+    private commandsToUndo: BaseCommand[] = [];
+    private commandsToRedo: BaseCommand[] = [];
 
     private renderer: Renderer;
     private gameField: GameField;
     private controls: Controls;
+    private ui: UI;
 
-    private animationFrameRequestId: number | null = null;
-    private subscription: Subscription;
+    private subscriptions: Subscription;
 
     public constructor(container: HTMLElement, initialState: GameState) {
         this.state = initialState;
 
         this.renderer = new Renderer(this.state.getConfig());
-        const canvasElement = this.renderer.getCanvasElement();
-
         this.gameField = new GameField(this.state.getConfig());
-        this.controls = new Controls(canvasElement, interactions.buildMouseInteractor(canvasElement));
+        this.controls = new Controls(this.renderer.getCanvasElement(), interactions.buildMouseInteractor);
+        this.ui = new UI(container, this.renderer, this.gameField, this.controls);
 
-        this.subscription = this.controls.onCursorMovement.subscribe(() => { this.dirty = true; });
-
-        container.appendChild(canvasElement);
+        this.subscriptions = this.controls.onClick.subscribe((position) => this.handleClick(position));
     }
 
     public start() {
-        this.sceduleAnimationFrame();
+        this.ui.startAnimationLoop();
+    }
+
+    public isUndoAvailable() {
+        return this.commandsToUndo.length > 0;
+    }
+
+    public isRedoAvailable() {
+        return this.commandsToRedo.length > 0;
     }
 
     public cleanup() {
-        if (this.animationFrameRequestId) {
-            cancelAnimationFrame(this.animationFrameRequestId);
-        }
-        this.subscription.unsubscribe();
-
+        this.subscriptions.unsubscribe();
         this.controls.cleanup();
+        this.ui.cleanup();
     }
 
-    private sceduleAnimationFrame() {
-        this.animationFrameRequestId = requestAnimationFrame(() => this.animationFrameHandler());
+    private doCommand(command: BaseCommand) {
+        command.do(this.getContextForCommands());
+        this.commandsToUndo.push(command);
     }
 
-    private animationFrameHandler() {
-        this.sceduleAnimationFrame();
+    private getContextForCommands() {
+        return {
+            gameField: this.gameField,
+            gameState: this.state,
+        };
+    }
 
-        if (!this.dirty) {
+    private handleClick(clickPosition: Vector2) {
+        const hitboxUnderMouse = hitboxService.getHitboxUnderMouse(clickPosition, this.gameField.getHitboxes(),
+            this.renderer.getCamera());
+        if (!hitboxUnderMouse) {
             return;
         }
 
-        this.checkHitboxHover();
-
-        this.renderer.renderScene(this.gameField.getScene());
-        this.dirty = false;
-    }
-
-    private checkHitboxHover() {
-        if (!this.controls.isInitialized()) {
-            return;
-        }
-
-        const hitboxUnderMouse = hitboxService.getHitboxUnderMouse(this.controls.getMousePosition(),
-            this.gameField.getHitboxes(), this.renderer.getCamera());
-
-        if (hitboxUnderMouse) {
-            this.setHoveredHitbox(hitboxUnderMouse);
-        } else {
-            this.clearHoveredHitbox();
-        }
-    }
-
-    private setHoveredHitbox(hitbox: Hitbox) {
-        if (this.hoveredHitbox === hitbox) {
-            return;
-        }
-
-        this.clearHoveredHitbox();
-
-        hitbox.hightlight();
-        this.hoveredHitbox = hitbox;
-        this.renderer.getCanvasElement().style.cursor = 'pointer';
-    }
-
-    private clearHoveredHitbox() {
-        if (this.hoveredHitbox === null) {
-            return;
-        }
-
-        this.hoveredHitbox.unhighlight();
-        this.hoveredHitbox = null;
-        this.renderer.getCanvasElement().style.cursor = 'default';
+        const pointPosition = this.gameField.fieldPositionToPointPosition(hitboxUnderMouse.getFieldPosition());
+        const command = new AddPointCommand(pointPosition);
+        this.doCommand(command);
     }
 }

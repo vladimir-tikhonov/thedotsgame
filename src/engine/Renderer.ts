@@ -33,11 +33,21 @@ export default class Renderer {
     }
 
     private initCamera(gameConfig: IGameConfig) {
-        const aspectRatio = window.innerWidth / window.innerHeight;
+        const cameraAspectRatio = gameConfig.horizontalFieldSize / gameConfig.verticalFieldSize;
+        const screenAspectRatio = window.innerWidth / window.innerHeight;
+        const aspectRatio = screenAspectRatio / cameraAspectRatio;
+
+        const [ widthExtension, heightExtension ] = aspectRatio > 1 ?
+            [aspectRatio, 1] :
+            [1, 1 / aspectRatio];
+
         this.camera = new OrthographicCamera(
-            -gameConfig.fieldSize / 2 * aspectRatio, gameConfig.fieldSize / 2 * aspectRatio,
-            gameConfig.fieldSize / 2, -gameConfig.fieldSize / 2,
-            0, 1,
+            (-gameConfig.horizontalFieldSize / 2) * widthExtension,
+            (gameConfig.horizontalFieldSize / 2) * widthExtension,
+            (gameConfig.verticalFieldSize / 2) * heightExtension,
+            (-gameConfig.verticalFieldSize / 2) * heightExtension,
+            0,
+            1,
         );
     }
 }

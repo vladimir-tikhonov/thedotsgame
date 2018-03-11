@@ -11,6 +11,8 @@ export interface IInteractor {
     subscription: Subscription;
 }
 
+export type InteractorBuilder = (htmlElement: HTMLElement) => IInteractor;
+
 export function buildMouseInteractor(htmlElement: HTMLElement): IInteractor {
     const cursorMovementObservable = Observable.fromEvent<MouseEvent>(htmlElement, 'mousemove')
         .map(extractClientPosition);

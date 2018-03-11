@@ -1,5 +1,22 @@
+declare module 'three/constants' {
+    export { VertexColors } from 'three';
+}
+
 declare module 'three/math/Vector2' {
-    export { Vector2 } from 'three';
+    import { Vector2 as BaseVector2 } from 'three';
+    import { Matrix3 } from 'three';
+
+    export class Vector2 extends BaseVector2 {
+        public applyMatrix3(m: Matrix3): Vector2;
+    }
+}
+
+declare module 'three/math/Vector3' {
+    export { Vector3 } from 'three';
+}
+
+declare module 'three/math/Matrix3' {
+    export { Matrix3 } from 'three';
 }
 
 declare module 'three/math/Color' {
@@ -10,8 +27,8 @@ declare module 'three/core/Raycaster' {
     export { Raycaster } from 'three';
 }
 
-declare module 'three/helpers/GridHelper' {
-    export { GridHelper } from 'three';
+declare module 'three/core/Geometry' {
+    export { Geometry } from 'three';
 }
 
 declare module 'three/cameras/Camera' {
@@ -20,6 +37,10 @@ declare module 'three/cameras/Camera' {
 
 declare module 'three/cameras/OrthographicCamera' {
     export { OrthographicCamera } from 'three';
+}
+
+declare module 'three/objects/LineSegments' {
+    export { LineSegments } from 'three';
 }
 
 declare module 'three/objects/Mesh' {

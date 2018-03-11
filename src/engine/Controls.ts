@@ -3,7 +3,7 @@ import { Subscription } from 'rxjs';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 
-import { IInteractor } from 'services/Interactions';
+import { InteractorBuilder } from 'services/Interactions';
 
 function toRelativePosition(element: HTMLElement, clientPosition: Vector2) {
     const boundingRect = element.getBoundingClientRect();
@@ -18,16 +18,17 @@ export default class Controls {
     public onClick: Observable<Vector2>;
 
     private mousePosition: Vector2 | null = null;
-    private subscription: Subscription;
+    private subscriptions: Subscription;
 
-    public constructor(canvas: HTMLCanvasElement, interactor: IInteractor) {
+    public constructor(canvas: HTMLCanvasElement, interactorBuilder: InteractorBuilder) {
         const toCanvasRelativePosition = (clientPosition: Vector2) => toRelativePosition(canvas, clientPosition);
+
+        const interactor = interactorBuilder(canvas);
         this.onCursorMovement = interactor.onCursorMovement.map(toCanvasRelativePosition);
         this.onClick = interactor.onClick.map(toCanvasRelativePosition);
 
-        this.subscription = this.onCursorMovement.subscribe((newCursorPosition) => {
-            this.handleNewCursorPosition(newCursorPosition);
-        }).add(interactor.subscription);
+        this.subscriptions = this.onCursorMovement.subscribe((position) => { this.handleNewCursorPosition(position); })
+            .add(interactor.subscription);
     }
 
     public isInitialized() {
@@ -43,7 +44,7 @@ export default class Controls {
     }
 
     public cleanup() {
-        this.subscription.unsubscribe();
+        this.subscriptions.unsubscribe();
     }
 
     private handleNewCursorPosition(newCursorPosition: Vector2) {
