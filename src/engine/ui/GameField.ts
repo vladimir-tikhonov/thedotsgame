@@ -86,8 +86,8 @@ export default class GameField {
     }
 
     private initTranslationMatrix(gameConfig: IGameConfig) {
-        const diffToLeftSide = -(gameConfig.horizontalFieldSize / 2 - 1);
-        const diffToTopSide = gameConfig.verticalFieldSize / 2 - 1;
+        const diffToLeftSide = -gameConfig.horizontalFieldSize / 2;
+        const diffToTopSide = gameConfig.verticalFieldSize / 2;
         this.pointToFieldPositionMatrix = new Matrix3().set(
             1,  0,  diffToLeftSide,
             0, -1,  diffToTopSide,
@@ -107,8 +107,8 @@ export default class GameField {
     }
 
     private initHitboxes(gameConfig: IGameConfig) {
-        for (let x = 0; x < gameConfig.horizontalFieldSize - 1; x++) {
-            for (let y = 0; y < gameConfig.verticalFieldSize - 1; y++) {
+        for (let x = 0; x <= gameConfig.horizontalFieldSize; x++) {
+            for (let y = 0; y <= gameConfig.verticalFieldSize; y++) {
                 this.addHitboxAt(this.pointPositionToFieldPosition(new Vector2(x, y)));
             }
         }

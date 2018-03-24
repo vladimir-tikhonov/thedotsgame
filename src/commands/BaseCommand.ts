@@ -1,8 +1,8 @@
-import GameField from 'engine/GameField';
+import UI from 'engine/UI';
 import GameState from 'entities/GameState';
 
 export interface ICommandContext {
-    gameField: GameField;
+    ui: UI;
     gameState: GameState;
 }
 

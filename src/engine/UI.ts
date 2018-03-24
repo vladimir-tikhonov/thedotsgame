@@ -1,12 +1,19 @@
+import { Vector2 } from 'three/math/Vector2';
 import { Subscription } from 'rxjs';
+import { Subject } from 'rxjs/Subject';
 
-import Renderer from 'engine/Renderer';
-import GameField from 'engine/GameField';
-import Controls from 'engine/Controls';
+import Renderer from 'engine/ui/Renderer';
+import GameField from 'engine/ui/GameField';
+import Controls from 'engine/ui/Controls';
 import Hitbox from 'entities/Hitbox';
+import Point from 'entities/Point';
 import * as hitboxService from 'services/Hitboxes';
+import * as interactions from 'services/Interactions';
+import { IGameConfig } from 'config/game';
 
 export default class UI {
+    public onClick = new Subject<Vector2>();
+
     private dirty = true;
     private hoveredHitbox: Hitbox | null = null;
 
@@ -18,21 +25,30 @@ export default class UI {
     private animationFrameRequestId: number | null = null;
     private subscription: Subscription;
 
-    public constructor(container: HTMLElement, renderer: Renderer, gameField: GameField, controls: Controls) {
+    public constructor(container: HTMLElement, config: IGameConfig) {
         this.container = container;
-        this.renderer = renderer;
-        this.gameField = gameField;
-        this.controls = controls;
+        this.renderer = new Renderer(config);
+        this.gameField = new GameField(config);
+        this.controls = new Controls(this.renderer.getCanvasElement(), interactions.buildMouseInteractor);
 
         this.container.appendChild(this.renderer.getCanvasElement());
 
         const markAsDirty = () => { this.dirty = true; };
         this.subscription = this.controls.onCursorMovement.subscribe(markAsDirty)
-            .add(this.gameField.onChange.subscribe(markAsDirty));
+            .add(this.gameField.onChange.subscribe(markAsDirty))
+            .add(this.controls.onClick.subscribe((fieldPosition) => this.handleClick(fieldPosition)));
     }
 
     public startAnimationLoop() {
         this.sceduleAnimationFrame();
+    }
+
+    public addPoint(newPoint: Point) {
+        this.gameField.addPoint(newPoint);
+    }
+
+    public removePoint(pointToRemove: Point) {
+        this.gameField.removePoint(pointToRemove);
     }
 
     public cleanup() {
@@ -40,6 +56,7 @@ export default class UI {
             cancelAnimationFrame(this.animationFrameRequestId);
         }
         this.subscription.unsubscribe();
+        this.controls.cleanup();
         this.container.removeChild(this.renderer.getCanvasElement());
     }
 
@@ -58,6 +75,17 @@ export default class UI {
 
         this.renderer.renderScene(this.gameField.getScene());
         this.dirty = false;
+    }
+
+    private handleClick(fieldPosition: Vector2) {
+        const hitboxUnderMouse = hitboxService.getHitboxUnderMouse(fieldPosition, this.gameField.getHitboxes(),
+            this.renderer.getCamera());
+        if (!hitboxUnderMouse) {
+            return;
+        }
+
+        const pointPosition = this.gameField.fieldPositionToPointPosition(hitboxUnderMouse.getFieldPosition());
+        this.onClick.next(pointPosition);
     }
 
     private checkHitboxHover() {

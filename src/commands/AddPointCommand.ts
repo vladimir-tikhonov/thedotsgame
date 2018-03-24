@@ -14,13 +14,13 @@ export default class AddPointCommand extends BaseCommand {
 
     public do(context: ICommandContext) {
         this.addedPoint = new Point(this.pointPosition);
-        context.gameField.addPoint(this.addedPoint);
+        context.ui.addPoint(this.addedPoint);
     }
 
     public undo(context: ICommandContext) {
         if (!this.addedPoint) {
             throw new Error('Command wasn\'t executed yet.');
         }
-        context.gameField.removePoint(this.addedPoint);
+        context.ui.removePoint(this.addedPoint);
     }
 }
