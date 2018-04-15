@@ -3,7 +3,7 @@ import { Subscription } from 'rxjs';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 
-import { InteractorBuilder } from 'services/Interactions';
+import { InteractorBuilder } from 'services/Interaction';
 
 function toRelativePosition(element: HTMLElement, clientPosition: Vector2) {
     const boundingRect = element.getBoundingClientRect();

@@ -13,14 +13,20 @@ export default class AddPointCommand extends BaseCommand {
     }
 
     public do(context: ICommandContext) {
-        this.addedPoint = new Point(this.pointPosition);
-        context.ui.addPoint(this.addedPoint);
+        const { ui, gameState } = context;
+
+        this.addedPoint = new Point(this.pointPosition, gameState.getCurrentPlayer());
+        ui.addPoint(this.addedPoint);
+        gameState.switchPlayer();
     }
 
     public undo(context: ICommandContext) {
         if (!this.addedPoint) {
             throw new Error('Command wasn\'t executed yet.');
         }
-        context.ui.removePoint(this.addedPoint);
+
+        const { ui, gameState } = context;
+        ui.removePoint(this.addedPoint);
+        gameState.switchPlayer();
     }
 }

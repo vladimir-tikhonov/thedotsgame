@@ -7,8 +7,8 @@ import GameField from 'engine/ui/GameField';
 import Controls from 'engine/ui/Controls';
 import Hitbox from 'entities/Hitbox';
 import Point from 'entities/Point';
-import * as hitboxService from 'services/Hitboxes';
-import * as interactions from 'services/Interactions';
+import * as hitboxService from 'services/Hitbox';
+import * as interactionService from 'services/Interaction';
 import { IGameConfig } from 'config/game';
 
 export default class UI {
@@ -29,7 +29,7 @@ export default class UI {
         this.container = container;
         this.renderer = new Renderer(config);
         this.gameField = new GameField(config);
-        this.controls = new Controls(this.renderer.getCanvasElement(), interactions.buildMouseInteractor);
+        this.controls = new Controls(this.renderer.getCanvasElement(), interactionService.buildMouseInteractor);
 
         this.container.appendChild(this.renderer.getCanvasElement());
 

@@ -1,13 +1,21 @@
 import { Vector2 } from 'three/math/Vector2';
 
-export default class Point {
-    private position: Vector2;
+import { Player } from 'entities/GameState';
 
-    public constructor(position: Vector2) {
-        this.position = position;
+export default class Point {
+    private pointPosition: Vector2;
+    private player: Player;
+
+    public constructor(pointPosition: Vector2, player: Player) {
+        this.pointPosition = pointPosition;
+        this.player = player;
     }
 
     public getPosition() {
-        return this.position;
+        return this.pointPosition;
+    }
+
+    public getPlayer() {
+        return this.player;
     }
 }

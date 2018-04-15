@@ -4,6 +4,7 @@
     "module": "es2015",
     "importHelpers": true,
     "sourceMap": true,
+    "pretty": true,
     "moduleResolution": "node",
     "baseUrl": "./src",
     "paths": {
@@ -13,11 +14,12 @@
     },
 
     "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "isolatedModules": true
   },
   "include": [
       "src/**/*",

@@ -5,7 +5,7 @@ import { BoxGeometry } from 'three/geometries/BoxGeometry';
 import { CircleGeometry } from 'three/geometries/CircleGeometry';
 import { DoubleSide } from 'three/constants';
 
-import styles from 'config/styles';
+import { hitbox as hitboxStyle } from 'config/styles';
 
 export default class Hitbox {
     private hitboxMesh: Mesh;
@@ -15,12 +15,12 @@ export default class Hitbox {
     public constructor(fieldPosition: Vector2) {
         this.fieldPosition = fieldPosition;
 
-        const material = new LineBasicMaterial({color: styles.point.colour, transparent: true, opacity: 0});
+        const material = new LineBasicMaterial({color: hitboxStyle.colour, transparent: true, opacity: 0});
         material.side = DoubleSide;
 
         this.hitboxMesh = new Mesh(new BoxGeometry(1, 1, 1), material.clone());
         this.hitboxMesh.position.set(fieldPosition.x, fieldPosition.y, 0);
-        this.highlightMesh = new Mesh(new CircleGeometry(styles.point.radius, styles.point.segments), material.clone());
+        this.highlightMesh = new Mesh(new CircleGeometry(hitboxStyle.radius, hitboxStyle.segments), material.clone());
         this.highlightMesh.position.set(fieldPosition.x, fieldPosition.y, 0);
     }
 
@@ -37,7 +37,7 @@ export default class Hitbox {
     }
 
     public hightlight() {
-        this.getHighlightMeshMaterial().opacity = styles.point.highlightOpacity;
+        this.getHighlightMeshMaterial().opacity = hitboxStyle.opacity;
     }
 
     public unhighlight() {
