@@ -8,6 +8,10 @@ const ASSETS_PATH = path.resolve(__dirname, 'assets');
 const BUILD_PATH = path.resolve(__dirname, 'build');
 const NODE_MODULES_PATH = path.resolve(__dirname, 'node_modules');
 
+const webpackMode = {
+    mode: process.env.NODE_ENV,
+};
+
 const entryPoint = {
     entry: path.resolve(SOURCE_PATH, 'index.ts'),
 };
@@ -69,6 +73,7 @@ const htmlPlugin = {
 };
 
 module.exports = merge(
+    webpackMode,
     entryPoint,
     output,
     resolveEstensions,
