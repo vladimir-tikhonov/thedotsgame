@@ -4,10 +4,12 @@ import { Color } from 'three/math/Color';
 import { Scene } from 'three/scenes/Scene';
 import { Subject } from 'rxjs/Subject';
 
-import Hitbox from 'entities/Hitbox';
-import Grid from 'entities/Grid';
+import Hitbox from 'entities/ui/Hitbox';
+import Grid from 'entities/ui/Grid';
 import Point from 'entities/Point';
-import PointOnField from 'entities/PointOnField';
+import PointOnField from 'entities/ui/PointOnField';
+import CapturedArea from 'entities/CapturedArea';
+import CapturedAreaOnField from 'entities/ui/CapturedAreaOnField';
 import { IGameConfig } from 'config/game';
 
 export default class GameField {
@@ -17,7 +19,8 @@ export default class GameField {
     private scene!: Scene;
     private grid!: Grid;
     private hitboxes: Hitbox[] = [];
-    private fieldPoints: PointOnField[] = [];
+    private pointsOnField: PointOnField[] = [];
+    private capturedAreasOnField: CapturedAreaOnField[] = [];
 
     public constructor(gameConfig: IGameConfig) {
         this.initTranslationMatrix(gameConfig);
@@ -47,24 +50,47 @@ export default class GameField {
         const fieldPosition = this.pointPositionToFieldPosition(newPoint.getPosition());
         const pointOnField = new PointOnField(newPoint, fieldPosition);
 
-        this.fieldPoints.push(pointOnField);
+        this.pointsOnField.push(pointOnField);
         this.scene.add(pointOnField.getMesh());
         this.removeHitboxAt(fieldPosition);
         this.onChange.next();
     }
 
     public removePoint(pointToRemove: Point) {
-        const pointIndex = this.fieldPoints.findIndex((pointOnField) => pointOnField.getPoint() === pointToRemove);
+        const pointIndex = this.pointsOnField.findIndex((pointOnField) => pointOnField.getPoint() === pointToRemove);
         if (pointIndex === -1) {
-            throw new Error('There is no such point on field');
+            throw new Error('There is no such point on the field.');
         }
 
-        const targetPointOnField = this.fieldPoints[pointIndex];
-        this.fieldPoints.splice(pointIndex, 1);
+        const targetPointOnField = this.pointsOnField[pointIndex];
+        this.pointsOnField.splice(pointIndex, 1);
         this.scene.remove(targetPointOnField.getMesh());
 
         const fieldPosition = this.pointPositionToFieldPosition(pointToRemove.getPosition());
         this.addHitboxAt(fieldPosition);
+        this.onChange.next();
+    }
+
+    public addCapturedArea(capturedArea: CapturedArea) {
+        const translatedPositions = capturedArea.getPath().getPoints()
+            .map((point) => this.pointPositionToFieldPosition(point.getPosition()));
+        const capturedAreasOnField = new CapturedAreaOnField(capturedArea, translatedPositions);
+
+        this.capturedAreasOnField.push(capturedAreasOnField);
+        this.scene.add(capturedAreasOnField.getMesh());
+        this.onChange.next();
+    }
+
+    public removeCapturedArea(capturedAreaToRemove: CapturedArea) {
+        const capturedAreaIndex = this.capturedAreasOnField
+            .findIndex((capturedAreaInField) => capturedAreaInField.getCapturedArea() === capturedAreaToRemove);
+        if (capturedAreaIndex === -1) {
+            throw new Error('There is no such point on the field.');
+        }
+        const targetCaptureAreaOnField = this.capturedAreasOnField[capturedAreaIndex];
+
+        this.capturedAreasOnField.splice(capturedAreaIndex, 1);
+        this.scene.remove(targetCaptureAreaOnField.getMesh());
         this.onChange.next();
     }
 

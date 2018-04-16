@@ -11,8 +11,8 @@ export interface IGameConfig {
 }
 
 export const defaultConfig: Readonly<IGameConfig> = {
-    horizontalFieldSize: 30,
-    verticalFieldSize: 20,
+    horizontalFieldSize: 19,
+    verticalFieldSize: 12,
     firstPlayerType: PlayerType.User,
     secondPlayerType: PlayerType.User,
 };

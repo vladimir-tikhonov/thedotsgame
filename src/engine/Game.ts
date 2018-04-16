@@ -18,7 +18,7 @@ export default class Game {
     public constructor(container: HTMLElement, initialState: GameState) {
         this.state = initialState;
 
-        this.ui = new UI(container, this.state.getConfig());
+        this.ui = new UI(container, this.state);
 
         this.subscriptions = this.ui.onClick.subscribe((pointPosition) => this.handleClick(pointPosition));
     }

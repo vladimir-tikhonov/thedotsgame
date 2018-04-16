@@ -5,11 +5,13 @@ import { Subject } from 'rxjs/Subject';
 import Renderer from 'engine/ui/Renderer';
 import GameField from 'engine/ui/GameField';
 import Controls from 'engine/ui/Controls';
-import Hitbox from 'entities/Hitbox';
+import Hitbox from 'entities/ui/Hitbox';
 import Point from 'entities/Point';
+import CapturedArea from 'entities/CapturedArea';
 import * as hitboxService from 'services/Hitbox';
 import * as interactionService from 'services/Interaction';
-import { IGameConfig } from 'config/game';
+import * as stylesService from 'services/Styles';
+import GameState from 'entities/GameState';
 
 export default class UI {
     public onClick = new Subject<Vector2>();
@@ -17,6 +19,7 @@ export default class UI {
     private dirty = true;
     private hoveredHitbox: Hitbox | null = null;
 
+    private gameState: GameState;
     private container: HTMLElement;
     private renderer: Renderer;
     private gameField: GameField;
@@ -25,10 +28,11 @@ export default class UI {
     private animationFrameRequestId: number | null = null;
     private subscription: Subscription;
 
-    public constructor(container: HTMLElement, config: IGameConfig) {
+    public constructor(container: HTMLElement, gameState: GameState) {
         this.container = container;
-        this.renderer = new Renderer(config);
-        this.gameField = new GameField(config);
+        this.gameState = gameState;
+        this.renderer = new Renderer(gameState.getConfig());
+        this.gameField = new GameField(gameState.getConfig());
         this.controls = new Controls(this.renderer.getCanvasElement(), interactionService.buildMouseInteractor);
 
         this.container.appendChild(this.renderer.getCanvasElement());
@@ -49,6 +53,14 @@ export default class UI {
 
     public removePoint(pointToRemove: Point) {
         this.gameField.removePoint(pointToRemove);
+    }
+
+    public addCapturedArea(newCapturedArea: CapturedArea) {
+        this.gameField.addCapturedArea(newCapturedArea);
+    }
+
+    public removeCapturedArea(capturedAreaToRemove: CapturedArea) {
+        this.gameField.removeCapturedArea(capturedAreaToRemove);
     }
 
     public cleanup() {
@@ -110,7 +122,7 @@ export default class UI {
 
         this.clearHoveredHitbox();
 
-        hitbox.hightlight();
+        hitbox.hightlight(stylesService.getPointColourForPlayer(this.gameState.getCurrentPlayer()));
         this.hoveredHitbox = hitbox;
         this.renderer.getCanvasElement().style.cursor = 'pointer';
     }

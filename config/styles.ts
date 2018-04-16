@@ -6,8 +6,11 @@ export const point = {
 };
 
 export const hitbox = {
-    colour: 0x000000,
     radius: 0.3,
     segments: 15,
-    opacity: 0.3,
+    opacity: 0.5,
+};
+
+export const capturedArea = {
+    opacity: 0.5,
 };

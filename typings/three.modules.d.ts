@@ -26,6 +26,10 @@ declare module 'three/core/Geometry' {
     export { Geometry } from 'three';
 }
 
+declare module 'three/core/Face3' {
+    export { Face3 } from 'three';
+}
+
 declare module 'three/cameras/Camera' {
     export { Camera } from 'three';
 }
