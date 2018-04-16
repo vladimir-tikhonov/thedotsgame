@@ -11,7 +11,10 @@
     "paths": {
         "config/*": [
             "../config/*"
-        ]
+        ],
+        "test/*": [
+            "../test/*"
+        ],
     },
 
     "strict": true,
@@ -25,6 +28,7 @@
   "include": [
       "src/**/*",
       "config/**/*",
-      "typings/**/*"
-  ]
+      "tests/**/*",
+      "typings/**/*",
+  ],
 }
